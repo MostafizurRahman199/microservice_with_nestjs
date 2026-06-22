@@ -17,6 +17,18 @@
     },
     {
       "path": "./shared"
+    },
+    {
+      "path": "./inventory-service-e2e"
+    },
+    {
+      "path": "./inventory-service"
+    },
+    {
+      "path": "./order-service-2-e2e"
+    },
+    {
+      "path": "./order-service-2"
     }
   ]
 }

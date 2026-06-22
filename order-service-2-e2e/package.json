@@ -1,0 +1,26 @@
+{
+  "name": "@org/order-service-2-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@org/order-service-2"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "order-service-2-e2e/jest.config.cts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@org/order-service-2:build",
+          "@org/order-service-2:serve"
+        ]
+      }
+    }
+  }
+}

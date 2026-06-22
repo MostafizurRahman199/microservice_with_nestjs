@@ -30,9 +30,15 @@
     "auth-service-e2e",
     "order-service",
     "order-service-e2e",
-    "shared"
+    "shared",
+    "inventory-service",
+    "inventory-service-e2e",
+    "order-service-2",
+    "order-service-2-e2e"
   ],
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/microservices": "^11.1.27",
