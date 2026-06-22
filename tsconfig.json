@@ -29,6 +29,18 @@
     },
     {
       "path": "./order-service-2"
+    },
+    {
+      "path": "./paymnet-service-e2e"
+    },
+    {
+      "path": "./paymnet-service"
+    },
+    {
+      "path": "./checkout-service-e2e"
+    },
+    {
+      "path": "./checkout-service"
     }
   ]
 }
