@@ -41,6 +41,18 @@
     },
     {
       "path": "./checkout-service"
+    },
+    {
+      "path": "./api-gateway-e2e"
+    },
+    {
+      "path": "./api-gateway"
+    },
+    {
+      "path": "./notification-service-e2e"
+    },
+    {
+      "path": "./notification-service"
     }
   ]
 }
