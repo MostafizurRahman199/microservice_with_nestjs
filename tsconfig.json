@@ -53,6 +53,12 @@
     },
     {
       "path": "./notification-service"
+    },
+    {
+      "path": "./product-service-e2e"
+    },
+    {
+      "path": "./product-service"
     }
   ]
 }
