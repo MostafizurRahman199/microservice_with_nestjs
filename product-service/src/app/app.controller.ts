@@ -21,7 +21,7 @@ export class AppController{
   updateProduct(
     @Param('id') id:string, 
     @Param('price') price:string
-  ){
+  ){ 
     return this.appService.updateProduct(
       Number(id),
       Number(price)
