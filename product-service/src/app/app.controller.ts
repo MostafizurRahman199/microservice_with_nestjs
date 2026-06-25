@@ -1,5 +1,8 @@
-import { Controller, Param, Get, Patch, Body  } from "@nestjs/common";
+import { Controller, Param, Get, Patch, Body, UseGuards  } from "@nestjs/common";
 import { AppService } from "./app.service";
+import { RateLimitGuard } from "../guards/rate-limit.guard";
+
+
 
 @Controller()
 export class AppController{
@@ -23,5 +26,11 @@ export class AppController{
       Number(id),
       Number(price)
     );
+  }
+
+  @Get('test')
+  @UseGuards(RateLimitGuard)
+  testEndpoint(){
+    return 'This is test endpoint';
   }
 }
