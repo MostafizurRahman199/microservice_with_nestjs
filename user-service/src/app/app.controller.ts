@@ -1,0 +1,14 @@
+import { Controller, Get } from '@nestjs/common';
+
+@Controller('users')
+export class AppController {
+
+  @Get()
+  getUsers(){
+    return {
+      success:true,
+      message:'Users fetched successfully',
+      servedByPort:process.env.PORT || 3002
+    }
+  }
+}

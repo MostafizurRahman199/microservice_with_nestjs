@@ -65,6 +65,12 @@
     },
     {
       "path": "./product-service-cqrs-kafka"
+    },
+    {
+      "path": "./user-service-e2e"
+    },
+    {
+      "path": "./user-service"
     }
   ]
 }

@@ -2,7 +2,10 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
   "private": true,
   "devDependencies": {
     "@nestjs/schematics": "^11.0.0",
@@ -46,7 +49,9 @@
     "product-service",
     "product-service-e2e",
     "product-service-cqrs-kafka",
-    "product-service-cqrs-kafka-e2e"
+    "product-service-cqrs-kafka-e2e",
+    "user-service",
+    "user-service-e2e"
   ],
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",

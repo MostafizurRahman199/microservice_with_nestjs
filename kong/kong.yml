@@ -1,0 +1,328 @@
+_format_version: "3.0"
+_transform: true
+
+# ==============================================================================
+# UPSTREAMS (Load Balancing)
+# ==============================================================================
+upstreams:
+  - name: user-service-upstream
+    targets:
+      - target: host.docker.internal:3002
+        weight: 100
+      - target: host.docker.internal:3012
+        weight: 100
+
+# ==============================================================================
+# SERVICES
+# ==============================================================================
+services:
+
+  # ----------------------------------------------------------------------------
+  # Auth Service — no JWT required (public login/register endpoints)
+  # ----------------------------------------------------------------------------
+  - name: auth-service
+    url: http://host.docker.internal:3001
+    routes:
+      - name: auth-login
+        paths:
+          - /api/auth/login
+        methods:
+          - POST
+        strip_path: false
+      - name: auth-register
+        paths:
+          - /api/auth/register
+        methods:
+          - POST
+        strip_path: false
+      - name: auth-refresh
+        paths:
+          - /api/auth/refresh
+        methods:
+          - POST
+        strip_path: false
+      - name: auth-logout
+        paths:
+          - /api/auth/logout
+        methods:
+          - POST
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 30
+          hour: 500
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # User Service
+  # ----------------------------------------------------------------------------
+  - name: user-service
+    host: user-service-upstream
+    protocol: http
+    routes:
+      - name: user-routes
+        paths:
+          - /api/users
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 60
+          hour: 1000
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # Product Service
+  # ----------------------------------------------------------------------------
+  - name: product-service
+    url: http://host.docker.internal:3003
+    routes:
+      - name: product-routes
+        paths:
+          - /api/products
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 120
+          hour: 2000
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # Product Service CQRS + Kafka
+  # ----------------------------------------------------------------------------
+  - name: product-service-cqrs-kafka
+    url: http://host.docker.internal:3004
+    routes:
+      - name: product-cqrs-routes
+        paths:
+          - /api/products/cqrs
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+
+  # ----------------------------------------------------------------------------
+  # Order Service
+  # ----------------------------------------------------------------------------
+  - name: order-service
+    url: http://host.docker.internal:3005
+    routes:
+      - name: order-routes
+        paths:
+          - /api/orders
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 60
+          hour: 1000
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # Inventory Service
+  # ----------------------------------------------------------------------------
+  - name: inventory-service
+    url: http://host.docker.internal:3006
+    routes:
+      - name: inventory-routes
+        paths:
+          - /api/inventory
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 60
+          hour: 1000
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # Payment Service
+  # ----------------------------------------------------------------------------
+  - name: payment-service
+    url: http://host.docker.internal:3007
+    routes:
+      - name: payment-routes
+        paths:
+          - /api/payments
+        methods:
+          - GET
+          - POST
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 20
+          hour: 200
+          policy: local
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 2
+
+  # ----------------------------------------------------------------------------
+  # Checkout Service
+  # ----------------------------------------------------------------------------
+  - name: checkout-service
+    url: http://host.docker.internal:3008
+    routes:
+      - name: checkout-routes
+        paths:
+          - /api/checkout
+        methods:
+          - GET
+          - POST
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 30
+          hour: 300
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # Notification Service
+  # ----------------------------------------------------------------------------
+  - name: notification-service
+    url: http://host.docker.internal:3009
+    routes:
+      - name: notification-routes
+        paths:
+          - /api/notifications
+        methods:
+          - GET
+          - POST
+          - DELETE
+        strip_path: false
+    plugins:
+      - name: jwt
+        config:
+          secret_is_base64: false
+          claims_to_verify:
+            - exp
+      - name: rate-limiting
+        config:
+          minute: 30
+          hour: 500
+          policy: local
+
+  # ----------------------------------------------------------------------------
+  # API Gateway health check
+  # ----------------------------------------------------------------------------
+  - name: api-gateway
+    url: http://host.docker.internal:4000
+    routes:
+      - name: gateway-routes
+        paths:
+          - /create-user
+        methods:
+          - GET
+        strip_path: false
+
+# ==============================================================================
+# GLOBAL PLUGINS
+# ==============================================================================
+plugins:
+
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+        - X-Requested-With
+      exposed_headers:
+        - X-Auth-Token
+      credentials: true
+      max_age: 3600
+
+  - name: correlation-id
+    config:
+      header_name: X-Correlation-ID
+      generator: uuid
+      echo_downstream: true
+
+  - name: request-size-limiting
+    config:
+      allowed_payload_size: 10
+
+# ==============================================================================
+# CONSUMERS
+# ==============================================================================
+consumers:
+  - username: frontend-client
+    jwt_secrets:
+      - key: frontend-client-key
+        secret: CHANGE_ME_TO_A_STRONG_SECRET_32CHARS
+
+  - username: internal-service
+    jwt_secrets:
+      - key: internal-service-key
+        secret: CHANGE_ME_TO_A_STRONG_SECRET_32CHARS
